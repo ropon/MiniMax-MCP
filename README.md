@@ -21,12 +21,12 @@
   <a href="https://github.com/MiniMax-AI/MiniMax-01/blob/main/figures/wechat-qrcode.jpeg" target="_blank" style="margin: 2px;">
     <img alt="WeChat" src="https://img.shields.io/badge/_WeChat-MiniMax-FF4040?style=flat-square&labelColor=2C3E50" style="display: inline-block; vertical-align: middle;"/>
   </a>
+  <a href="https://www.modelscope.cn/organization/MiniMax" target="_blank" style="margin: 2px;">
+    <img alt="ModelScope" src="https://img.shields.io/badge/_ModelScope-MiniMax-FF4040?style=flat-square&labelColor=2C3E50" style="display: inline-block; vertical-align: middle;"/>
+  </a>
 </div>
 <div align="center" style="line-height: 1;">
-  <a href="https://github.com/MiniMax-AI/MiniMax-01/blob/main/LICENSE-MODEL" style="margin: 2px;">
-    <img alt="Model License" src="https://img.shields.io/badge/_Model_License-Model_Agreement-FF4040?style=flat-square&labelColor=2C3E50" style="display: inline-block; vertical-align: middle;"/>
-  </a>
-   <a href="https://github.com/MiniMax-AI/MiniMax-01/blob/main/LICENSE-CODE" style="margin: 2px;">
+   <a href="https://github.com/MiniMax-AI/MiniMax-MCP/blob/main/LICENSE" style="margin: 2px;">
     <img alt="Code License" src="https://img.shields.io/badge/_Code_License-MIT-FF4040?style=flat-square&labelColor=2C3E50" style="display: inline-block; vertical-align: middle;"/>
   </a>
 </div>
