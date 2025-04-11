@@ -1,8 +1,8 @@
 """Minimax API client base class."""
 
 import requests
-from typing import Any, Dict, Optional
-from .exceptions import MinimaxAuthError, MinimaxRequestError
+from typing import Any, Dict
+from minimax_mcp.exceptions import MinimaxAuthError, MinimaxRequestError
 
 class MinimaxAPIClient:
     """Base client for making requests to Minimax API."""
@@ -18,7 +18,8 @@ class MinimaxAPIClient:
         self.api_host = api_host
         self.session = requests.Session()
         self.session.headers.update({
-            'Authorization': f'Bearer {api_key}'
+            'Authorization': f'Bearer {api_key}',
+            'MM-API-Source': 'Minimax-MCP'
         })
 
     def _make_request(
@@ -63,16 +64,17 @@ class MinimaxAPIClient:
             # Check API-specific error codes
             base_resp = data.get("base_resp", {})
             if base_resp.get("status_code") != 0:
-                if base_resp.get("status_code") == 1004:
-                    raise MinimaxAuthError(
-                        f"API Error: {base_resp.get('status_msg')}, please check your API key."
-                        f"Trace-Id: {response.headers.get('Trace-Id')}"
-                    )
-                else:
-                    raise MinimaxRequestError(
-                        f"API Error: {base_resp.get('status_msg')} "
-                        f"Trace-Id: {response.headers.get('Trace-Id')}"
-                    )
+                match base_resp.get("status_code"):
+                    case 1004:
+                        raise MinimaxAuthError(
+                            f"API Error: {base_resp.get('status_msg')}, please check your API key and API host."
+                            f"Trace-Id: {response.headers.get('Trace-Id')}"
+                        )
+                    case _:
+                        raise MinimaxRequestError(
+                            f"API Error: {base_resp.get('status_msg')} "
+                            f"Trace-Id: {response.headers.get('Trace-Id')}"
+                        )
                 
             return data
             

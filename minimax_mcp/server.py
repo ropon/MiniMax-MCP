@@ -17,7 +17,7 @@ import requests
 import time
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
-from mcp.types import TextContent, ImageContent
+from mcp.types import TextContent
 from minimax_mcp.utils import (
     build_output_path,
     build_output_file,
@@ -32,6 +32,7 @@ load_dotenv()
 api_key = os.getenv(ENV_MINIMAX_API_KEY)
 base_path = os.getenv(ENV_MINIMAX_MCP_BASE_PATH)
 api_host = os.getenv(ENV_MINIMAX_API_HOST)
+resource_mode = os.getenv(ENV_RESOURCE_MODE) or RESOURCE_MODE_URL
 
 
 if not api_key:
@@ -103,14 +104,19 @@ def text_to_audio(
         },
         "language_boost": language_boost
     }
-
+    if resource_mode == RESOURCE_MODE_URL:
+        payload["output_format"] = "url"
     try:
         response_data = api_client.post("/v1/t2a_v2", json=payload)
         audio_data = response_data.get('data', {}).get('audio', '')
         
         if not audio_data:
             raise MinimaxRequestError(f"Failed to get audio data from response")
-
+        if resource_mode == RESOURCE_MODE_URL:
+            return TextContent(
+                type="text",
+                text=f"Success. Audio URL: {audio_data}"
+            )
         # hex->bytes
         audio_bytes = bytes.fromhex(audio_data)
 
@@ -217,7 +223,11 @@ def voice_clone(
                 type="text",
                 text=f"Voice cloned successfully: Voice ID: {voice_id}"
             )
-        
+        if resource_mode == RESOURCE_MODE_URL:
+            return TextContent(
+                type="text",
+                text=f"Success. Demo audio URL: {response_data.get('demo_audio')}"
+            )
         # step3: download demo audio
         output_path = build_output_path(output_directory, base_path)
         output_file_name = build_output_file("voice_clone", text, output_path, "wav")
@@ -243,11 +253,24 @@ def voice_clone(
         )
 
 
-@mcp.tool(description="Play an audio file. Supports WAV and MP3 formats. Not supports video.")
-def play_audio(input_file_path: str) -> TextContent:
-    file_path = process_input_file(input_file_path)
-    play(open(file_path, "rb").read())
-    return TextContent(type="text", text=f"Successfully played audio file: {file_path}")
+@mcp.tool(
+    description="""Play an audio file. Supports WAV and MP3 formats. Not supports video.
+
+     Args:
+        input_file_path (str): The path to the audio file to play.
+        is_url (bool, optional): Whether the audio file is a URL.
+    Returns:
+        Text content with the path to the audio file.
+    """
+)
+def play_audio(input_file_path: str, is_url: bool = False) -> TextContent:
+    if is_url:
+        play(requests.get(input_file_path).content)
+        return TextContent(type="text", text=f"Successfully played audio file: {input_file_path}")
+    else:
+        file_path = process_input_file(input_file_path)
+        play(open(file_path, "rb").read())
+        return TextContent(type="text", text=f"Successfully played audio file: {file_path}")
 
 
 @mcp.tool(
@@ -256,8 +279,8 @@ def play_audio(input_file_path: str) -> TextContent:
     COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.
 
      Args:
-        model (str, optional): The model to use. Values range ["T2V-01", "T2V-01-Director", "I2V-01", "I2V-01-Director", "I2V-01-live"], with "T2V-01" being the default. "Director" supports inserting instructions for camera movement control. "I2V" for image to video.
-        prompt (str): The prompt to generate the video from. When use Director model, the promptSupported 15 Camera Movement Instructions (Enumerated Values)
+        model (str, optional): The model to use. Values range ["T2V-01", "T2V-01-Director", "I2V-01", "I2V-01-Director", "I2V-01-live"]. "Director" supports inserting instructions for camera movement control. "I2V" for image to video. "T2V" for text to video.
+        prompt (str): The prompt to generate the video from. When use Director model, the prompt supports 15 Camera Movement Instructions (Enumerated Values)
             -Truck: [Truck left], [Truck right]
             -Pan: [Pan left], [Pan right]
             -Push: [Push in], [Pull out]
@@ -267,7 +290,7 @@ def play_audio(input_file_path: str) -> TextContent:
             -Shake: [Shake]
             -Follow: [Tracking shot]
             -Static: [Static shot]
-        first_frame_image (str): The first frame image, must be a valid url or dataurl.
+        first_frame_image (str): The first frame image. The model must be "I2V" Series.
         output_directory (str, optional): The directory to save the video to.
     Returns:
         Text content with the path to the output video file.
@@ -314,27 +337,19 @@ def generate_video(
         retry_interval = 20  # seconds
         
         for attempt in range(max_retries):
-            try:
-                status_response = api_client.get(f"/v1/query/video_generation?task_id={task_id}")
-                status = status_response.get("status")
-                
-                if status == "Fail":
-                    raise MinimaxRequestError(f"Video generation failed for task_id: {task_id}")
-                elif status == "Success":
-                    file_id = status_response.get("file_id")
-                    if file_id:
-                        break
-                    raise MinimaxRequestError(f"Missing file_id in success response for task_id: {task_id}")
-                
-                # Still processing, wait and retry
-                time.sleep(retry_interval)
-                
-            except MinimaxAPIError as e:
-                # Log the error but continue retrying
-                print(f"Attempt {attempt + 1}/{max_retries} failed: {str(e)}")
-                if attempt == max_retries - 1:
-                    raise MinimaxRequestError(f"Video generation timed out after {max_retries} attempts")
-                time.sleep(retry_interval)
+            status_response = api_client.get(f"/v1/query/video_generation?task_id={task_id}")
+            status = status_response.get("status")
+            
+            if status == "Fail":
+                raise MinimaxRequestError(f"Video generation failed for task_id: {task_id}")
+            elif status == "Success":
+                file_id = status_response.get("file_id")
+                if file_id:
+                    break
+                raise MinimaxRequestError(f"Missing file_id in success response for task_id: {task_id}")
+            
+            # Still processing, wait and retry
+            time.sleep(retry_interval)
 
         if not file_id:
             raise MinimaxRequestError(f"Failed to get file_id for task_id: {task_id}")
@@ -345,7 +360,11 @@ def generate_video(
         
         if not download_url:
             raise MinimaxRequestError(f"Failed to get download URL for file_id: {file_id}")
-
+        if resource_mode == RESOURCE_MODE_URL:
+            return TextContent(
+                type="text",
+                text=f"Success. Video URL: {download_url}"
+            )
         # step4: download and save video
         output_path = build_output_path(output_directory, base_path)
         output_file_name = build_output_file("video", task_id, output_path, "mp4", True)
@@ -420,7 +439,11 @@ def text_to_image(
         
         if not image_urls:
             raise MinimaxRequestError("No images generated")
-
+        if resource_mode == RESOURCE_MODE_URL:
+            return TextContent(
+                type="text",
+                text=f"Success. Image URLs: {image_urls}"
+            )
         output_path = build_output_path(output_directory, base_path)
         output_file_names = []
         
