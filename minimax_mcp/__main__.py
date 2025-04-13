@@ -47,13 +47,9 @@ def generate_config(api_key: str | None = None):
     config = {
         "mcpServers": {
             "Minimax": {
-                # "command": "uvx",
-                # "args": [
-                #     "minimax-mcp",
-                # ],
-                "command": python_path,
+                "command": "uvx",
                 "args": [
-                    str(server_path),
+                    "minimax-mcp",
                 ],
 
                 "env": {
