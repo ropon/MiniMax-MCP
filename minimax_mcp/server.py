@@ -184,8 +184,9 @@ def list_voices(
 
      Args:
         voice_id (str): The id of the voice to use.
-        file (str): The path to the audio file to clone.
+        file (str): The path to the audio file to clone or a URL to the audio file.
         text (str, optional): The text to use for the demo audio.
+        is_url (bool, optional): Whether the file is a URL. Defaults to False.
     Returns:
         Text content with the voice id of the cloned voice.
     """
@@ -194,14 +195,26 @@ def voice_clone(
     voice_id: str, 
     file: str,
     text: str,
-    output_directory: str | None = None
+    output_directory: str | None = None,
+    is_url: bool = False
 ) -> TextContent:
     try:
         # step1: upload file
-        with open(file, 'rb') as f:
-            files = {'file': f}
+        if is_url:
+            # download file from url
+            response = requests.get(file, stream=True)
+            response.raise_for_status()
+            files = {'file': ('audio_file.mp3', response.raw, 'audio/mpeg')}
             data = {'purpose': 'voice_clone'}
             response_data = api_client.post("/v1/files/upload", files=files, data=data)
+        else:
+            # open and upload file
+            if not os.path.exists(file):
+                raise MinimaxRequestError(f"Local file does not exist: {file}")
+            with open(file, 'rb') as f:
+                files = {'file': f}
+                data = {'purpose': 'voice_clone'}
+                response_data = api_client.post("/v1/files/upload", files=files, data=data)
             
         file_id = response_data.get("file",{}).get("file_id")
         if not file_id:
