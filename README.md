@@ -31,11 +31,13 @@
   </a>
 </div>
 
-<p align="center" style="line-height: 1.5; font-size: 18px; margin: 4px auto; text-decoration: underline;"><a href="README-CN.md">中文版</a></p>
-
 <p align="center">
   Official MiniMax Model Context Protocol (MCP) server that enables interaction with powerful Text to Speech and video/image generation APIs. This server allows MCP clients like <a href="https://www.anthropic.com/claude">Claude Desktop</a>, <a href="https://www.cursor.so">Cursor</a>, <a href="https://codeium.com/windsurf">Windsurf</a>, <a href="https://github.com/openai/openai-agents-python">OpenAI Agents</a> and others to generate speech, clone voices, generate video, generate image and more.
 </p>
+
+## Documentation
+- [中文文档](README-CN.md)
+- [MiniMax-MCP-JS](https://github.com/MiniMax-AI/MiniMax-MCP-JS) - Official JavaScript implementation of MiniMax MCP
 
 ## Quickstart with MCP Client
 1. Get your API key from [MiniMax](https://www.minimax.io/platform/user-center/basic-information/interface-key). 
