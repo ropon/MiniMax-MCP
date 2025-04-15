@@ -63,7 +63,7 @@
 
 ```
 
-⚠️ 注意：国内Host：`https://api.minimax.chat`，国际Host：`https://api.minimaxi.chat`
+⚠️ 注意：API Key需要与Host匹配。如果出现“API Error: invalid api key”错误，请检查您的API Host。国内版Host：`https://api.minimax.chat`，国际版Host：`https://api.minimaxi.chat`。请注意，国际版Host **minimaxi**相较于国内版**minimax**多了一个 **"i"** 字母，请仔细核对。
 
 如果你使用Windows，你需要在Claude Desktop中启用"开发者模式"才能使用MCP服务器。点击左上角汉堡菜单中的"Help"，然后选择"Enable Developer Mode"。
 
