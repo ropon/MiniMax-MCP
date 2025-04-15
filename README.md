@@ -62,7 +62,7 @@ Go to `Claude > Settings > Developer > Edit Config > claude_desktop_config.json`
 }
 
 ```
-⚠️ Warning: The API key needs to match the host. If an error "API Error: invalid api key" occurs, please check your api host: Global Host：​https://api.minimaxi.chat, Chinese Host：​https://api.minimax.chat.
+⚠️ Warning: The API key needs to match the host. If an error "API Error: invalid api key" occurs, please check your api host: Global Host：​https://api.minimaxi.chat, Mainland Host：​https://api.minimax.chat.
 
 🔍 Notice: Please note that the global host **minimaxi** contains an extra **"i"** compared to the mainland host **minimax**.
 
