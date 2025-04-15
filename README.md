@@ -62,6 +62,7 @@ Go to `Claude > Settings > Developer > Edit Config > claude_desktop_config.json`
 }
 
 ```
+⚠️ Warning: The API key needs to match the host. If an error "API Error: invalid api key" occurs, please check your api host: Global Host：​https://api.minimaxi.chat, Chinese Host：​https://api.minimax.chat.
 
 If you're using Windows, you will have to enable "Developer Mode" in Claude Desktop to use the MCP server. Click "Help" in the hamburger menu in the top left and select "Enable Developer Mode".
 
