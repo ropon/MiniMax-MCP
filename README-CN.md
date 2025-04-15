@@ -48,7 +48,7 @@
 {
   "mcpServers": {
     "MiniMax": {
-      "command": "uvx"
+      "command": "uvx",
       "args": [
         "minimax-mcp"
       ],

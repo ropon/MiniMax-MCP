@@ -48,7 +48,7 @@ Go to `Claude > Settings > Developer > Edit Config > claude_desktop_config.json`
 {
   "mcpServers": {
     "MiniMax": {
-      "command": "uvx"
+      "command": "uvx",
       "args": [
         "minimax-mcp"
       ],
