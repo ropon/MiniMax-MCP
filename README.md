@@ -75,6 +75,23 @@ Go to `Cursor -> Preferences -> Cursor Settings -> MCP -> Add new global MCP Ser
 
 That's it. Your MCP client can now interact with MiniMax through these tools:
 
+## Transport
+We support two transport types: stdio and sse.
+| stdio  | SSE  |
+|:-----|:-----|
+| Run locally | Can be deployed locally or in the cloud |
+| Communication through `stdout` | Communication through `network` |
+| Input: Supports processing `local files` or valid `URL` resources | Input: When deployed in the cloud, it is recommended to use `URL` for input |
+
+## Available Tools
+| tool  | description  |
+|-|-|
+|`text_to_audio`|Convert text to audio with a given voice|
+|`list_voices`|List all voices available|
+|`voice_clone`|Clone a voice using provided audio files|
+|`generate_video`|Generate a video from a prompt|
+|`text_to_image`|Generate a image from a prompt|
+
 ## Example usage
 
 ⚠️ Warning: Using these tools may incur costs.

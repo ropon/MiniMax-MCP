@@ -76,6 +76,23 @@
 
 你的MCP客户端现在可以通过Claude Desktop和Cursor等这些工具与MiniMax交互：
 
+## Transport
+我们支持两种传输方式: stdio and sse.
+| stdio  | SSE  |
+|:-----|:-----|
+| 在本地部署运行 | 本地或云端部署均可  |
+|通过 stdout 进行通信| 通过网络通信|
+|输入：支持处理本地文件，或有效的URL资源| 输入: 若部署在云端，建议使用URL进行输入|
+
+## 可用方法
+| 方法  | 描述  |
+|-|-|
+|`text_to_audio`|使用指定音色将文本生成音频|
+|`list_voices`|查询所有可用音色|
+|`voice_clone`|根据指定音频文件克隆音色|
+|`generate_video`|根据指定 prompt 生成视频|
+|`text_to_image`|根据指定 prompt 生成图片|
+
 ## 使用示例
 
 ⚠️ 注意：使用这些工具可能会产生费用。
