@@ -1,0 +1,32 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - minimaxApiKey
+    properties:
+      minimaxApiKey:
+        type: string
+        description: Your MiniMax API key to authenticate with the MiniMax service.
+      minimaxApiHost:
+        type: string
+        default: https://api.minimax.chat
+        description: The MiniMax API host URL. Typically 'https://api.minimax.chat' for
+          mainland users.
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({
+      command: 'minimax-mcp',
+      args: [],
+      env: {
+        MINIMAX_API_KEY: config.minimaxApiKey,
+        MINIMAX_API_HOST: config.minimaxApiHost
+      }
+    })
+  exampleConfig:
+    minimaxApiKey: example_api_key_12345
+    minimaxApiHost: https://api.minimax.chat
