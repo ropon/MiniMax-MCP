@@ -1,23 +1,43 @@
-FROM python:3.11-alpine
+# Start with Alpine Python image
+FROM python:3.11-alpine AS builder
 
-# 设置工作目录
+# Set up the working directory
 WORKDIR /app
 
-# 安装 uv 包管理器
-RUN pip install uv
+# Install necessary build dependencies
+RUN apk add --no-cache gcc musl-dev libffi-dev
 
-# 将项目文件复制到容器中
-COPY . .
+# Install uv
+RUN pip install --no-cache-dir uv
 
-# 安装项目依赖
-RUN uv pip install .
+# Enable bytecode compilation and set copy mode for mounted volumes
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
 
-# 设置环境变量
+# Install the project's dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev --no-editable
+
+# Add the project source code and install it
+ADD . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --no-editable
+
+# Start the final stage with a clean Alpine Python image
+FROM python:3.11-alpine
+
+# Set up the working directory
+WORKDIR /app
+
+# Copy only the virtual environment from the builder stage
+COPY --from=builder /app/.venv /app/.venv
+
+# Add the virtual environment to the PATH
+ENV PATH="/app/.venv/bin:$PATH"
 ENV MINIMAX_API_KEY=your_api_key_here
 ENV MINIMAX_API_HOST=https://api.minimax.chat
 
-# 暴露端口（如果使用SSE模式）
-EXPOSE 8000
-
-# 设置入口命令
-ENTRYPOINT ["uv", "run", "/app/minimax-mcp/server.py"]
+# Set the entrypoint
+ENTRYPOINT ["minimax-mcp"]
