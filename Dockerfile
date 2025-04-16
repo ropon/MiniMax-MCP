@@ -74,21 +74,11 @@ FROM python:3.11-alpine
 # Set up the working directory
 WORKDIR /app
 
-# Install uv in the final image
-RUN pip install --no-cache-dir uv
-
 # Copy only the virtual environment from the builder stage
 COPY --from=builder /app/.venv /app/.venv
 
 # Add the virtual environment to the PATH
 ENV PATH="/app/.venv/bin:$PATH"
-
-# Copy uv.lock and pyproject.toml for potential future use
-COPY uv.lock pyproject.toml ./
-
-# Set environment variables for uv
-ENV UV_COMPILE_BYTECODE=1
-ENV UV_LINK_MODE=copy
 
 # app env
 ENV MINIMAX_API_HOST=https://api.minimax.chat
