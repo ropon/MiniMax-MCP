@@ -13,3 +13,12 @@ dist/
 minimax_mcp.egg-info/
 .coverage
 coverage.xml
+
+# 添加Docker相关忽略项
+.docker/
+
+# 排除特定文件
+!.env.example
+!.env.docker.example
+.idea/
+.vscode/
